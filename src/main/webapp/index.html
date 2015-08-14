@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="lib/jquery-2.1.4.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            var expertData={};
+            $('#choose').click(function(){
+                $.get('api/expert/'+$('#expert').val(),{user:$('#user').val(),pwd:$('#pwd').val()},function(data){
+                    expertData = data;
+                    htmls=[];
+                    for(var i =0;i< expertData.hospitals.length;i++){
+                       var hospital =  expertData.hospitals[i];
+                       htmls.push('<button data-hid="'+hospital.id+'">'+hospital.name+'</button>');
+                    }
+                    $('#hospitals').empty();
+                    $('#hospitals').append(htmls.join('\n'));
+                    $('#hospitals button').click(clickHospital);
+                    $('#hospitals button').first().click()
+                });
+            });
+            var clickHospital = function(event){
+                var hospitalId = $(event.target).attr('data-hid');
+                var hospital = null;
+                for(var i =0;i<expertData.hospitals.length;i++){
+                    var hospital =  expertData.hospitals[i];
+                    if(hospital.id == hospitalId){
+                        break;
+                    }
+                }
+                htmls=[];
+                for(var i =0;i< hospital.depts.length;i++){
+                   var dept =  hospital.depts[i];
+                   htmls.push('<button data-hid="'+hospital.id+'" data-did="'+dept.id+'">'+dept.name+'</button>');
+                }
+                $('#depts').empty();
+                $('#depts').append(htmls.join('\n'));
+                $('#depts button').click(clickDept);
+                $('#depts button').first().click()
+            }
+            var clickDept = function(event){
+                var deptId = $(event.target).attr('data-did');
+                var hospitalId = $(event.target).attr('data-hid');
+                var dept = null;
+                for(var i =0;i<expertData.hospitals.length;i++){
+                    var hospital =  expertData.hospitals[i];
+                    if(hospital.id == hospitalId){
+                        for(var j=0;j<hospital.depts.length;j++){
+                            dept = hospital.depts[j];
+                            if(dept.id == deptId){
+                                break;
+                            }
+                        }
+                    }
+                }
+                $('#reaservationRule').html(dept.shiftcase[0].scheduleData.reaservationRule.join('<br/>'));
+                var schedules = dept.shiftcase[0].scheduleData.schedules;
+                var htmls=[];
+                for(var i=0;i<schedules.length;i++){
+                    var schedule = schedules[i];
+                    if(schedule.morning){
+                        htmls.push('<div>')
+                        htmls.push(schedule.date+'('+schedule.week+'),上午,'+schedule.morning.clinicType+',挂号费:'+schedule.morning.price+'元')
+                        htmls.push('<button data-hid="'+hospital.id+'" data-did="'+dept.id+'">预约</button>');
+                        htmls.push('</div>')
+                    }
+                }
+                $('#schedules').empty();
+                $('#schedules').append(htmls.join('\n'));
+            }
+        });
+    </script>
+</head>
+<body>
+<label>用户名:</label><input id="user"/>
+<label>密码:</label> <input type="password" id="pwd"/>
+<label>请输入医师ID：</label> <input id="expert" placeholder="CCF26DB04E9E1DF9E040A8C0790228AB" value="138181403741063"/>
+<button id="choose">选择日期</button>
+<br/>
+<label>
+    <span style="word-break: break-all;">提示: 在挂号网上选择医师后的页面的网址: http://www.guahao.com/expert/</span>
+    <span style="color:red;word-break: break-all;">CCF26DB04E9E1DF9E040A8C0790228AB</span>
+    <span style="word-break: break-all;">?hospDeptId=CCF26DB04E761DF9E040A8C0790228AB 中的红色部分</span>
+</label>
+<div id="info">
+    <div>
+        <span>选择医院</span>
+        <span id="hospitals"></span>
+    </div>
+    <div>
+        <span>选择科室</span>
+        <span id="depts"></span>
+    </div>
+    <div>
+        <span id="reaservationRule"></span>
+        <div id="schedules"></div>
+    </div>
+</div>
+</body>
+</html>

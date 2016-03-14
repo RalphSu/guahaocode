@@ -44,15 +44,15 @@ public class CodeTest {
 
     }
 
-    /**
-     * Method: guess(URL url)
-     */
-    @Test
-    public void testGuess1() throws Exception {
-        Code code = new Code();
-        String guessCode = code.guess(new File("/home/shaoaq/Downloads/codetest_dycn.jpg").toURI().toURL());
-        System.out.println(guessCode);
-    }
+//    /**
+//     * Method: guess(URL url)
+//     */
+//    @Test
+//    public void testGuess1() throws Exception {
+//        Code code = new Code();
+//        String guessCode = code.guess(new File("/home/shaoaq/Downloads/codetest_dycn.jpg").toURI().toURL());
+//        System.out.println(guessCode);
+//    }
 
     /**
      * Method: guess(URL url)
